@@ -12,6 +12,10 @@
     <h1>Учет работы сварщиков</h1>
     <main id="app"></main>
     <script src="script.js" type="module"></script>
-    <script src="service-worker-registration.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/welder-pwa/ws.js');
+  }
+</script>
 </body>
 </html>
