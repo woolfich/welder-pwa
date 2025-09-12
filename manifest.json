@@ -1,21 +1,21 @@
 {
-    "name": "Учет работы сварщиков",
-    "short_name": "Сварщики PWA",
-    "description": "PWA для учета выполненной работы сварщиков",
-    "start_url": "/index.html",
-    "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#ffffff",
-    "icons": [
-        {
-            "src": "./icons/icon-192x192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "./icons/icon-512x512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        }
-    ]
+  "name": "Учет работы сварщиков",
+  "short_name": "Сварщики PWA",
+  "description": "PWA для учета выполненной работы сварщиков",
+  "start_url": "/welder-pwa/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/welder-pwa/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/welder-pwa/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
