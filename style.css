@@ -1,0 +1,298 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+#app {
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+/* Добавьте свои стили здесь */
+/* Стили для главного экрана */
+.main-screen {
+    text-align: center;
+    padding: 20px;
+}
+
+.main-screen h2 {
+    color: #0056b3;
+    margin-bottom: 20px;
+}
+
+#addWelderBtn {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+#addWelderBtn:hover {
+    background-color: #218838;
+}
+
+#welderList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.welder-item {
+    background-color: #007bff;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.welder-item:hover {
+    background-color: #0056b3;
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 30px;
+}
+
+.navigation-buttons button {
+    background-color: #6c757d;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.navigation-buttons button:hover {
+    background-color: #5a6268;
+}
+
+/* Стили для секции добавления сварщика */
+.add-welder-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.add-welder-section input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    flex-grow: 1;
+    max-width: 300px; /* Ограничиваем ширину поля ввода */
+}
+
+.add-welder-section button {
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.add-welder-section button:hover {
+    background-color: #218838;
+}
+
+/* Стили для экрана Базы данных */
+.database-screen {
+    text-align: center;
+    padding: 20px;
+}
+
+.database-screen h2 {
+    color: #0056b3;
+    margin-bottom: 20px;
+}
+
+.add-product-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.add-product-section input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    flex-grow: 1;
+    max-width: 300px;
+}
+
+.add-product-section button {
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.add-product-section button:hover {
+    background-color: #218838;
+}
+
+#productList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.product-item {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 18px;
+    text-align: left;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Стили для кнопки "На главный экран" */
+.database-screen #backToMainBtn,
+.summary-screen #backToMainBtn,
+.welder-card-screen #backToMainBtn {
+    background-color: #6c757d;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.database-screen #backToMainBtn:hover,
+.summary-screen #backToMainBtn:hover,
+.welder-card-screen #backToMainBtn:hover {
+    background-color: #5a6268;
+}
+
+/* Стили для экрана Карточки сварщика */
+.welder-card-screen {
+    text-align: center;
+    padding: 20px;
+}
+
+.welder-card-screen h2 {
+    color: #0056b3;
+    margin-bottom: 20px;
+}
+
+.input-record-section {
+    display: flex;
+    flex-wrap: wrap; /* Для адаптивности на маленьких экранах */
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-record-section input[type="text"],
+.input-record-section input[type="number"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    flex: 1; /* Позволяет элементам занимать доступное пространство */
+    min-width: 120px; /* Минимальная ширина для полей ввода */
+}
+
+.input-record-section button {
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.input-record-section button:hover {
+    background-color: #218838;
+}
+
+#welderRecordsList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+    text-align: left;
+    max-height: 300px; /* Ограничиваем высоту для скролла */
+    overflow-y: auto; /* Добавляем скролл */
+    border: 1px solid #eee;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.welder-record-item {
+    background-color: #e9ecef;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #343a40;
+}
+
+/* Стили для экрана Сводки */
+.summary-screen {
+    text-align: center;
+    padding: 20px;
+}
+
+.summary-screen h2 {
+    color: #0056b3;
+    margin-bottom: 20px;
+}
+
+#overallSummaryList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+    text-align: left;
+    max-height: 400px; /* Ограничиваем высоту для скролла */
+    overflow-y: auto; /* Добавляем скролл */
+    border: 1px solid #eee;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.summary-item {
+    background-color: #e9ecef;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #343a40;
+}
