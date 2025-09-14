@@ -182,15 +182,30 @@ h1 {
 .database-screen #backToMainBtn,
 .summary-screen #backToMainBtn,
 .welder-card-screen #backToMainBtn {
+    position: fixed; /* Закрепляем кнопку */
+    bottom: 20px;    /* Отступ снизу */
+    left: 50%;       /* Центрируем по горизонтали */
+    transform: translateX(-50%); /* Точное центрирование */
+    width: calc(100% - 40px); /* Ширина с отступами по бокам */
+    max-width: 400px; /* Максимальная ширина для больших экранов */
     background-color: #6c757d;
     color: white;
-    padding: 12px 25px;
+    padding: 15px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
-    margin-top: 20px;
+    z-index: 100; /* Чтобы кнопка была поверх других элементов */
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* Тень для выделения */
 }
+
+/* Добавляем отступ снизу для контента, чтобы кнопка его не перекрывала */
+.database-screen,
+.summary-screen,
+.welder-card-screen {
+    padding-bottom: 100px; /* Отступ, равный высоте кнопки + отступы */
+}
+
 
 .database-screen #backToMainBtn:hover,
 .summary-screen #backToMainBtn:hover,
