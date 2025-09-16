@@ -267,7 +267,7 @@ async function loadProducts() {
 async function addProductRecord(welderId, article, quantity) {
     try {
         const now = new Date();
-        const dateString = now.toLocaleDateString('ru-RU'); // Формат даты
+        const dateString = now.toISOString().split('T')[0]; // "2025-09-14"
 
         // Проверяем, есть ли уже запись для этого сварщика и артикула
         const records = await getAllData(OBJECT_STORES.WELDER_RECORDS);
@@ -309,11 +309,10 @@ async function loadWelderRecords(welderId) {
             const recordItem = document.createElement('div');
             recordItem.className = 'welder-record-item';
             recordItem.textContent = `${record.article} ${record.quantity} шт ${record.date}`;
-            welderRecordsListDiv.appendChild(recordItem);
+            welderRecordsListDiv.prepend(recordItem);
         });
     }
 }
-
 // Функция для загрузки и отображения общей сводки по изделиям
 async function loadOverallSummary() {
     const overallSummaryListDiv = document.getElementById('overallSummaryList');
