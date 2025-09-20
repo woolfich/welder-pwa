@@ -309,39 +309,306 @@ async function loadWelderRecords(welderId) {
             const recordItem = document.createElement('div');
             recordItem.className = 'welder-record-item';
             recordItem.textContent = `${record.article} ${record.quantity} шт ${record.date}`;
+            
+            // Переменные для отслеживания долгого нажатия
+            let longPressTimer;
+            let isLongPress = false;
+            
+            // Обработчик начала нажатия (мышь и тач)
+            const startPress = (e) => {
+                isLongPress = false;
+                longPressTimer = setTimeout(() => {
+                    isLongPress = true;
+                    showContextMenu(record, welderId);
+                }, 500); // 500ms для долгого нажатия
+            };
+            
+            // Обработчик окончания нажатия
+            const endPress = (e) => {
+                clearTimeout(longPressTimer);
+                if (!isLongPress) {
+                    // Короткий клик - автозаполнение артикула
+                    const productArticleInput = document.getElementById('productArticleInput');
+                    if (productArticleInput) {
+                        productArticleInput.value = record.article;
+                        const productQuantityInput = document.getElementById('productQuantityInput');
+                        if (productQuantityInput) {
+                            productQuantityInput.focus();
+                        }
+                    }
+                }
+            };
+            
+            // Добавляем обработчики для мыши и тача
+            recordItem.addEventListener('mousedown', startPress);
+            recordItem.addEventListener('mouseup', endPress);
+            recordItem.addEventListener('mouseleave', () => clearTimeout(longPressTimer));
+            recordItem.addEventListener('touchstart', startPress);
+            recordItem.addEventListener('touchend', endPress);
+            
             welderRecordsListDiv.prepend(recordItem);
         });
     }
 }
-// Функция для загрузки и отображения общей сводки по изделиям
+
+// Функция для показа контекстного меню при долгом нажатии
+function showContextMenu(record, welderId) {
+    // Создаем модальное окно
+    const modal = document.createElement('div');
+    modal.className = 'context-modal';
+    modal.innerHTML = `
+        <div class="context-modal-content">
+            <h3>Артикул: ${record.article}</h3>
+            <p>Текущее количество: ${record.quantity} шт</p>
+            <div class="context-buttons">
+                <button id="editQuantityBtn">Редактировать количество</button>
+                <button id="showHistoryBtn">История за месяц</button>
+                <button id="closeModalBtn">Закрыть</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Обработчики кнопок
+    document.getElementById('editQuantityBtn').addEventListener('click', () => {
+        editQuantity(record, welderId);
+        document.body.removeChild(modal);
+    });
+    
+    document.getElementById('showHistoryBtn').addEventListener('click', () => {
+        showArticleHistory(record.article, welderId);
+        document.body.removeChild(modal);
+    });
+    
+    document.getElementById('closeModalBtn').addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+}
+
+// Функция для редактирования количества записи
+async function editQuantity(record, welderId) {
+    // Создаем модальное окно для редактирования
+    const modal = document.createElement('div');
+    modal.className = 'context-modal';
+    modal.innerHTML = `
+        <div class="context-modal-content">
+            <h3>Редактировать количество</h3>
+            <p>Артикул: ${record.article}</p>
+            <input type="number" id="editQuantityInput" value="${record.quantity}" step="0.1" min="0.1" style="width: 100%; padding: 8px; margin: 10px 0;">
+            <div class="context-buttons">
+                <button id="saveQuantityBtn">Сохранить</button>
+                <button id="cancelEditBtn">Отмена</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    const editInput = document.getElementById('editQuantityInput');
+    const saveBtn = document.getElementById('saveQuantityBtn');
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    
+    // Фокус на поле ввода
+    editInput.focus();
+    editInput.select();
+    
+    // Обработчик сохранения
+    saveBtn.addEventListener('click', async () => {
+        const newQuantity = parseFloat(editInput.value);
+        if (!isNaN(newQuantity) && newQuantity > 0) {
+            // Обновляем запись
+            record.quantity = newQuantity;
+            try {
+                await updateData(OBJECT_STORES.WELDER_RECORDS, record);
+                console.log(`Количество для записи ${record.id} обновлено до ${newQuantity}`);
+                alert('Количество успешно обновлено!');
+                
+                // Обновляем отображение
+                await loadWelderRecords(welderId);
+                
+                // Удаляем модальное окно
+                document.body.removeChild(modal);
+            } catch (error) {
+                console.error('Ошибка при обновлении записи:', error);
+                alert('Не удалось обновить запись. Попробуйте еще раз.');
+            }
+        } else {
+            alert('Пожалуйста, введите корректное количество (больше 0).');
+        }
+    });
+    
+    // Обработчик отмены
+    cancelBtn.addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+    
+    // Закрытие по нажатию Enter в поле ввода
+    editInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            saveBtn.click();
+        }
+    });
+}
+// Функция для отображения истории записи артикула за месяц
+async function showArticleHistory(article, welderId) {
+    // Создаем модальное окно для истории
+    const modal = document.createElement('div');
+    modal.className = 'context-modal';
+    modal.innerHTML = `
+        <div class="context-modal-content">
+            <h3>История для: ${article}</h3>
+            <div id="historyList" style="text-align: left; max-height: 300px; overflow-y: auto; margin: 10px 0;">
+                <p>Загрузка истории...</p>
+            </div>
+            <div class="context-buttons">
+                <button id="closeHistoryBtn">Закрыть</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    const historyList = document.getElementById('historyList');
+    const closeBtn = document.getElementById('closeHistoryBtn');
+    
+    try {
+        // Получаем все записи для этого сварщика и артикула
+        const allRecords = await getAllData(OBJECT_STORES.WELDER_RECORDS);
+        const articleRecords = allRecords.filter(record => 
+            record.welderId === welderId && 
+            record.article.toLowerCase() === article.toLowerCase()
+        );
+        
+        if (articleRecords.length === 0) {
+            historyList.innerHTML = '<p>История отсутствует.</p>';
+            return;
+        }
+        
+        // Сортируем по дате (новые сверху)
+        articleRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        // Определяем текущий месяц и год для фильтрации
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+        
+        // Фильтруем записи только за текущий месяц
+        const currentMonthRecords = articleRecords.filter(record => {
+            const recordDate = new Date(record.date);
+            return recordDate.getMonth() === currentMonth && 
+                   recordDate.getFullYear() === currentYear;
+        });
+        
+        if (currentMonthRecords.length === 0) {
+            historyList.innerHTML = '<p>Нет записей за текущий месяц.</p>';
+            return;
+        }
+        
+        // Формируем HTML для истории
+        let historyHTML = '<h4>Записи за текущий месяц:</h4>';
+        currentMonthRecords.forEach(record => {
+            const recordDate = new Date(record.date);
+            const formattedDate = recordDate.toLocaleDateString('ru-RU');
+            historyHTML += `<p>${formattedDate}: ${record.quantity} шт</p>`;
+        });
+        
+        historyList.innerHTML = historyHTML;
+        
+    } catch (error) {
+        console.error('Ошибка при загрузке истории:', error);
+        historyList.innerHTML = '<p>Ошибка загрузки истории.</p>';
+    }
+    
+    // Обработчик закрытия
+    closeBtn.addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+}
+
+// Функция для загрузки и отображения общей сводки по изделиям с группировкой по месяцам
 async function loadOverallSummary() {
     const overallSummaryListDiv = document.getElementById('overallSummaryList');
     overallSummaryListDiv.innerHTML = ''; // Очищаем список перед загрузкой
 
     const allRecords = await getAllData(OBJECT_STORES.WELDER_RECORDS);
-    const summary = {};
+    
+    if (allRecords.length === 0) {
+        overallSummaryListDiv.innerHTML = '<p>Сводка пока пуста. Добавьте записи о работе сварщиков.</p>';
+        return;
+    }
+
+    // Сортировка записей по дате (новые сверху)
+    allRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // Группировка записей по месяцам
+    const recordsByMonth = {};
+    const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+                        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
     allRecords.forEach(record => {
-        const article = record.article.toLowerCase();
-        if (summary[article]) {
-            summary[article] += record.quantity;
-        } else {
-            summary[article] = record.quantity;
+        const recordDate = new Date(record.date);
+        const year = recordDate.getFullYear();
+        const monthIndex = recordDate.getMonth();
+        const monthKey = `${year}-${monthIndex}`; // Уникальный ключ для месяца
+
+        if (!recordsByMonth[monthKey]) {
+            recordsByMonth[monthKey] = {
+                displayName: `${monthNames[monthIndex]} ${year}`,
+                records: []
+            };
         }
+        recordsByMonth[monthKey].records.push(record);
     });
 
-    const sortedArticles = Object.keys(summary).sort();
+    // Получаем отсортированные ключи месяцев в обратном порядке (новые сверху)
+    const sortedMonthKeys = Object.keys(recordsByMonth).sort().reverse();
 
-    if (sortedArticles.length === 0) {
-        overallSummaryListDiv.innerHTML = '<p>Сводка пока пуста. Добавьте записи о работе сварщиков.</p>';
-    } else {
-        sortedArticles.forEach(article => {
-            const summaryItem = document.createElement('div');
-            summaryItem.className = 'summary-item';
-            summaryItem.textContent = `${article}: ${summary[article].toFixed(1)} шт`; // Округляем до 1 знака после запятой
-            overallSummaryListDiv.appendChild(summaryItem);
+    // Для каждого месяца считаем сводку
+    sortedMonthKeys.forEach((monthKey, index) => {
+        const monthGroup = recordsByMonth[monthKey];
+        
+        // Создаем сводку для текущего месяца
+        const summary = {};
+        monthGroup.records.forEach(record => {
+            const article = record.article.toLowerCase();
+            if (summary[article]) {
+                summary[article] += record.quantity;
+            } else {
+                summary[article] = record.quantity;
+            }
         });
-    }
+
+        // Добавляем заголовок месяца
+        const monthHeader = document.createElement('div');
+        monthHeader.className = 'month-header';
+        monthHeader.textContent = monthGroup.displayName;
+        monthHeader.style.fontWeight = 'bold';
+        monthHeader.style.backgroundColor = '#d1ecf1';
+        monthHeader.style.padding = '8px';
+        monthHeader.style.marginTop = '10px';
+        monthHeader.style.borderRadius = '4px';
+        overallSummaryListDiv.appendChild(monthHeader);
+
+        // Добавляем записи сводки месяца
+        const sortedArticles = Object.keys(summary).sort();
+        if (sortedArticles.length === 0) {
+            const emptyItem = document.createElement('div');
+            emptyItem.className = 'summary-item';
+            emptyItem.textContent = 'Нет записей';
+            emptyItem.style.backgroundColor = '#f8f9fa';
+            emptyItem.style.padding = '8px';
+            emptyItem.style.borderRadius = '4px';
+            overallSummaryListDiv.appendChild(emptyItem);
+        } else {
+            sortedArticles.forEach(article => {
+                const summaryItem = document.createElement('div');
+                summaryItem.className = 'summary-item';
+                summaryItem.textContent = `${article}: ${summary[article].toFixed(1)} шт`;
+                overallSummaryListDiv.appendChild(summaryItem);
+            });
+        }
+    });
 }
 
 // Инициализация приложения при загрузке DOM
